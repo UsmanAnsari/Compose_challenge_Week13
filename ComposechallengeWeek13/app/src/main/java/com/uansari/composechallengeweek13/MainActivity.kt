@@ -60,158 +60,171 @@ class MainActivity : ComponentActivity() {
                                 SwipeButton(
                                     modifier = Modifier.align(Alignment.Center),
                                 ) {
-                                    navController.popBackStack()
+                                    navController.navigate("alert")
                                 }
                             }
                         }
+                        composable("alert") {
+                            AlertDialog(
+                                onDismissRequest = {
+                                    navController.popBackStack(
+                                        route = "list",
+                                        false
+                                    )
+                                },
+                                title = {
+                                    Text(text = "Unlocked Successfully")
+                                },
+                                text = {
+                                    Text("Screen unlocked successfully")
+                                },
+                                confirmButton = {
+                                    Button(
+                                        onClick = {
+                                            navController.popBackStack(
+                                                route = "list",
+                                                false
+                                            )
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            Color.DarkGray
+                                        )
+
+                                    ) {
+                                        Text("OK")
+                                    }
+                                }
+                            )
+
+                        }
+
                     }
-
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun TaskList(
-    names: List<String> = arrayListOf(
-        "Slide to Unlock",
-        "Task 1",
-        "Task 2",
-        "Task 3",
-        "Task 4",
-        "Task 5",
-    ), onClick: (name: String) -> Unit
-) {
-    Surface {
-        LazyColumn(Modifier.padding(vertical = 4.dp)) {
-            items(items = names) { name ->
-                TaskItem(name = name, onClick)
-            }
-        }
-    }
-}
-
-@Composable
-fun TaskItem(name: String, onClick: (name: String) -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-    ) {
-        Spacer(Modifier.size(4.dp))
-        Button(
-            onClick = { onClick(name) },
-            contentPadding = PaddingValues(all = 24.dp),
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(Color.LightGray),
-            border = BorderStroke(2.dp, Color.DarkGray),
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text(
-                text = name, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.DarkGray
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun SwipeButton(
-    modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(20.dp),
-    borderStroke: BorderStroke = BorderStroke(2.dp, Color.DarkGray),
-    elevation: Dp = 8.dp,
-    textStyle: TextStyle = TextStyle(Color.DarkGray, 20.sp),
-    onSwipe: () -> Unit
-) {
-    val swipeableState = rememberSwipeableState(initialValue = 0)
-    val textAlpha by animateFloatAsState(
-        if (swipeableState.offset.value > 10f) (1 - swipeableState.progress.fraction) else 1f
-    )
-
-    if (swipeableState.isAnimationRunning) {
-        DisposableEffect(Unit) {
-            onDispose {
-                if (swipeableState.currentValue == 1) {
-                    onSwipe()
                 }
             }
         }
     }
 
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = shape,
-        border = borderStroke,
-        elevation = elevation,
+    @Composable
+    fun TaskList(
+        names: List<String> = arrayListOf(
+            "Slide to Unlock",
+            "Task 1",
+            "Task 2",
+            "Task 3",
+            "Task 4",
+            "Task 5",
+        ), onClick: (name: String) -> Unit
     ) {
-        BoxWithConstraints(
+        Surface {
+            LazyColumn(Modifier.padding(vertical = 4.dp)) {
+                items(items = names) { name ->
+                    TaskItem(name = name, onClick)
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun TaskItem(name: String, onClick: (name: String) -> Unit) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.LightGray)
-                .padding(16.dp),
+                .padding(horizontal = 8.dp)
         ) {
-            var iconSize by remember { mutableStateOf(IntSize.Zero) }
-            val maxWidth = with(LocalDensity.current) {
-                this@BoxWithConstraints.maxWidth.toPx() - iconSize.width
+            Button(
+                onClick = { onClick(name) },
+                contentPadding = PaddingValues(all = 24.dp),
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(Color.LightGray),
+                border = BorderStroke(2.dp, Color.DarkGray),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text(
+                    text = name,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.DarkGray
+                )
             }
+            Spacer(Modifier.size(4.dp))
+        }
+    }
 
-            Text(
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    fun SwipeButton(
+        modifier: Modifier = Modifier,
+        shape: Shape = RoundedCornerShape(20.dp),
+        borderStroke: BorderStroke = BorderStroke(2.dp, Color.DarkGray),
+        elevation: Dp = 8.dp,
+        textStyle: TextStyle = TextStyle(Color.DarkGray, 20.sp),
+        onSwipe: () -> Unit
+    ) {
+        val swipeableState = rememberSwipeableState(initialValue = 0)
+        val textAlpha by animateFloatAsState(
+            if (swipeableState.offset.value > 10f) (1 - swipeableState.progress.fraction) else 1f
+        )
+
+        if (swipeableState.isAnimationRunning) {
+            DisposableEffect(Unit) {
+                onDispose {
+                    if (swipeableState.currentValue == 1) {
+                        onSwipe()
+                    }
+                }
+            }
+        }
+
+        Surface(
+            modifier = modifier.fillMaxWidth(),
+            shape = shape,
+            border = borderStroke,
+            elevation = elevation,
+        ) {
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.Center),
-                textAlign = TextAlign.End,
-                text = "slide to unlock",
-                style = textStyle.copy(color = textStyle.color.copy(alpha = textAlpha))
-            )
-            Box(modifier = Modifier
-                .onGloballyPositioned {
-                    iconSize = it.size
+                    .background(Color.LightGray)
+                    .padding(16.dp),
+            ) {
+                var iconSize by remember { mutableStateOf(IntSize.Zero) }
+                val maxWidth = with(LocalDensity.current) {
+                    this@BoxWithConstraints.maxWidth.toPx() - iconSize.width
                 }
-                .swipeable(
-                    state = swipeableState,
-                    anchors = mapOf(
-                        0f to 0, maxWidth to 1
-                    ),
-                    thresholds = { _, _ -> FractionalThreshold(0.9f) },
-                    orientation = Orientation.Horizontal
-                )
-                .offset {
-                    IntOffset(swipeableState.offset.value.roundToInt(), 0)
-                }) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = Color.LightGray,
+
+                Text(
                     modifier = Modifier
-                        .size(36.dp)
-                        .background(Color.DarkGray, shape = CircleShape),
+                        .fillMaxWidth()
+                        .align(Alignment.Center),
+                    textAlign = TextAlign.End,
+                    text = "slide to unlock",
+                    style = textStyle.copy(color = textStyle.color.copy(alpha = textAlpha))
                 )
+                Box(modifier = Modifier
+                    .onGloballyPositioned {
+                        iconSize = it.size
+                    }
+                    .swipeable(
+                        state = swipeableState,
+                        anchors = mapOf(
+                            0f to 0, maxWidth to 1
+                        ),
+                        thresholds = { _, _ -> FractionalThreshold(0.9f) },
+                        orientation = Orientation.Horizontal
+                    )
+                    .offset {
+                        IntOffset(swipeableState.offset.value.roundToInt(), 0)
+                    }) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowRight,
+                        contentDescription = null,
+                        tint = Color.LightGray,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .background(Color.DarkGray, shape = CircleShape),
+                    )
+                }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Preview() {
-    ComposeChallengeWeek13Theme {
-        SwipeButton {
-
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ComposeChallengeWeek13Theme {
-        Greeting("Android")
     }
 }
